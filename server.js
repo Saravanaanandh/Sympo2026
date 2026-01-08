@@ -30,23 +30,32 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
   res.send("Server is alive");
 });
-app.post('/sendmail', async (req, res) => {
-    console.log("📩 /sendmail hit", req.body);
-    const { email,name } = req.body;  
-    try{
-        const mailOptions = {
-            from:'saravanawebdev@gmail.com',
-            to:email,
-            subject:"Registration succuessful",
-            html:`<div><h1>Hi ${name},</h1><p>welcome to Sympo 2026</p></div>`, 
-        }
-        await transporter.sendMail(mailOptions) 
-        res.status(200).json({message:"Registration successful, email sent"})
-    }catch(error){
-        res.status(500).json({message:"Registration failed, email not sent"})
-    }
+app.post("/sendmail", async (req, res) => {
+  console.log("📩 /sendmail hit", req.body);
 
+  try {
+    const info = await transporter.sendMail({
+      from: "saravanawebdev@gmail.com",
+      to: req.body.email,
+      subject: "Registration successful",
+      html: `<h2>Hi ${req.body.name}</h2><p>Welcome to Sympo 2026</p>`,
+    });
+
+    console.log("✅ Email sent:", info.response);
+
+    res.status(200).json({
+      message: "Registration successful, email sent",
+    });
+  } catch (error) {
+    console.error("❌ Email error:", error);
+
+    res.status(500).json({
+      message: "Email sending failed",
+      error: error.message,
+    });
+  }
 });
+
 app.listen(PORT,  '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
