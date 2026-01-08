@@ -22,8 +22,16 @@ const transporter = nodemailer.createTransport({
         pass:process.env.PASSWORD,
     }
 })
+app.use((req, res, next) => {
+  console.log("➡️ Incoming request:", req.method, req.url);
+  next();
+});
 
+app.get("/", (req, res) => {
+  res.send("Server is alive");
+});
 app.post('/sendmail', async (req, res) => {
+    console.log("📩 /sendmail hit", req.body);
     const { email,name } = req.body;  
     try{
         const mailOptions = {
@@ -39,6 +47,6 @@ app.post('/sendmail', async (req, res) => {
     }
 
 });
-app.listen(PORT, () => {
+app.listen(PORT,  '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
